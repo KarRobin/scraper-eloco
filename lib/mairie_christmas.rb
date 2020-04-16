@@ -8,12 +8,12 @@ def scrap_choice
 
     page = Nokogiri::HTML(open("http://www.annuaire-des-mairies.com/#{nb_departement}/"))
     list_communes = page.css("pre/a").map(&:text).map{|x| x[0..-6]}
-    list_communes.delete[1..6]
+    5.times {list_communes.shift}
 
 end
 
 # Scrap Val d'Oise
-def scrap_communes_list
+def scrap_95
     page = Nokogiri::HTML(open("http://annuaire-des-mairies.com/val-d-oise.html"))
     @list_communes = page.css("td/p/a").map(&:text).map!(&:downcase).each {
         |x| x.gsub!(/\s/, "-")}
@@ -22,7 +22,7 @@ end
 def get_mail
     email_communes = Array.new
     # Appel liste des communues pour un passage en boucle
-    scrap_communes_list.each {|city_name_formated|
+    scrap_95.each {|city_name_formated|
         # Requete de la page pour la ville X
         page = Nokogiri::HTML(open("http://annuaire-des-mairies.com/95/#{city_name_formated}.html"))
 
@@ -34,9 +34,9 @@ def get_mail
         # Stockage dans l'array email communes
         email_communes << page.css("/html/body/div/main/section[2]/div/table/tbody/tr[4]/td[2]").map(&:text)
     }
-    p email_communes
+
     p @list_communes.zip(email_communes).to_h
     
 end
 
-p scrap_choice
+get_mail
